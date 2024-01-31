@@ -81,9 +81,6 @@ if __name__ == '__main__':
     if args.encrypt and args.decrypt:
         stderr.write("Only encryption or decryption can be selected; not both.\n")
     
-    # if not args.encrypt and not args.decrypt:
-        # stderr.write("An encryption operation (encrypt or decrypt) must be selected.\n")
-
     if not args.decrypt:
         args.encrypt = True
 
