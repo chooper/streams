@@ -27,13 +27,13 @@ def main(args):
         real_output_file = True
         output_fd = open(args.output, 'bw+')
 
-    input = stdin.buffer.read()
+    input = input_fd.read()
     decoded = decode(input, args.input_encoding)
     
     output = xor_bytes(args.key, decoded)
 
     encoded = encode(output, args.output_encoding)
-    stdout.buffer.write(encoded)
+    output_fd.write(encoded)
 
     if real_input_file:
         input_fd.close()
