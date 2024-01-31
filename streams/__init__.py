@@ -8,20 +8,11 @@ import base64
 from binascii import hexlify, unhexlify
 from Crypto.Cipher import AES
 from Crypto import Random
+from Crypto.Util.Padding import pad, unpad
 
 ENCODING_CHOICES = ['raw', 'hex', 'base64']
 
 BS = AES.block_size
-
-def _unpad(b):
-    padding_byte = b[len(b) - 1]
-    padding_len = int(padding_byte)
-    return b[:padding_len]
-
-def _pad(b):
-    padding_needed = (BS - len(b) % BS)
-    padding_byte = padding_needed.to_bytes(1, 'little')
-    return b + (padding_needed * bytearray(padding_byte))
 
 def aes_decrypt(raw, key, iv=None):
     # if an iv hasn't been provided, it's probably prepended to the cryptotext
@@ -31,10 +22,10 @@ def aes_decrypt(raw, key, iv=None):
 
     cipher = AES.new(key, AES.MODE_CBC, iv)
     plain = cipher.decrypt(raw)
-    return _unpad(plain)
+    return unpad(plain, AES.block_size)
 
 def aes_encrypt(raw, key, iv=None):
-    raw = _pad(raw)
+    raw = pad(raw, AES.block_size)
 
     if not iv:
         iv = Random.new().read(AES.block_size)
