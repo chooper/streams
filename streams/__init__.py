@@ -33,18 +33,6 @@ def aes_encrypt(raw, key, iv=None):
 
     return iv + cipher.encrypt(raw)
 
-def xor_bytes(key, input):
-    key_len = len(key)
-    input_len = len(input)
-
-    buf = bytes()
-    for input_idx in range(input_len):
-        key_idx = input_idx % key_len
-        c = input[input_idx] ^ key[key_idx]
-        buf += c.to_bytes(1, 'little')
-
-    return buf
-
 def encode(in_bytes, enc_type):
     if enc_type not in ENCODING_CHOICES:
         raise ValueError('Invalid encoding type: {}'.format(enc_type))
@@ -73,3 +61,15 @@ def decode(in_bytes, enc_type):
         in_bytes = in_bytes.replace('0x'.encode(), ''.encode())
         in_bytes = in_bytes.replace(','.encode(),  ''.encode())
         return unhexlify(in_bytes)
+
+def xor_bytes(key, input):
+    key_len = len(key)
+    input_len = len(input)
+
+    buf = bytes()
+    for input_idx in range(input_len):
+        key_idx = input_idx % key_len
+        c = input[input_idx] ^ key[key_idx]
+        buf += c.to_bytes(1, 'little')
+
+    return buf
