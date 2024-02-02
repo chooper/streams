@@ -30,7 +30,7 @@ def main(args):
     input = input_fd.read()
     decoded = decode(input, args.input_encoding)
     
-    output = xor_bytes(args.key, decoded)
+    output = xor_bytes(args.key, decoded, args.offset)
 
     encoded = encode(output, args.output_encoding)
     output_fd.write(encoded)
@@ -50,7 +50,8 @@ if __name__ == '__main__':
     parser.add_argument('key', help='key used for the XOR operation')
     parser.add_argument('-K', '--key-encoding', help='encoding used for key',
                         choices=ENCODING_CHOICES, default='raw')
-    
+    parser.add_argument('-f', '--offset', help='where in input to begin XOR operation. negative numbers result in input prepended with \\xFF. useful for alignment issues.',
+                        type=int, default=0)
     parser.add_argument('-i', '--input', help='file to read or - for STDIN', default='-')
     parser.add_argument('-I', '--input-encoding', help='encoding used for input file',
                         choices=ENCODING_CHOICES, default='raw')

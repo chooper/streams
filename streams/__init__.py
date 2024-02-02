@@ -67,11 +67,11 @@ def decode(in_bytes, enc_type):
 def mime_extract(name, in_bytes):
     """
     Example MIME content:
---d089ddf8bf654f4f81448b78f0be30d1
-Content-Disposition: form-data; name="data"
+    --d089ddf8bf654f4f81448b78f0be30d1
+    Content-Disposition: form-data; name="data"
 
-Wz/AcWLJvO+yS7Yg9tiMV/WnJ4KNkHWR8d47ENus6Kqr...
---d089ddf8bf654f4f81448b78f0be30d1--
+    Wz/AcWLJvO+yS7Yg9tiMV/WnJ4KNkHWR8d47ENus6Kqr...
+    --d089ddf8bf654f4f81448b78f0be30d1--
     """
 
     # discover MIME boundary
@@ -89,7 +89,9 @@ Wz/AcWLJvO+yS7Yg9tiMV/WnJ4KNkHWR8d47ENus6Kqr...
     boundary = m['boundary']
     content_type = 'multipart/form-data; boundary={}'.format(boundary)
 
-    in_bytes = in_bytes.replace(b'\n', b'\r\n')
+    if b'\r\n\r\n' not in in_bytes:
+        in_bytes = in_bytes.replace(b'\n', b'\r\n')
+    
     decoder = MultipartDecoder(in_bytes, content_type)
     name_pat = '(.*);\s*name="(?P<name>[A-Za-z0-9\-_]+)"(.*)'
     for part in decoder.parts:
@@ -101,12 +103,18 @@ Wz/AcWLJvO+yS7Yg9tiMV/WnJ4KNkHWR8d47ENus6Kqr...
 
     return None
 
-def xor_bytes(key, input):
+def xor_bytes(key, input, offset=0):
+    # prepend input if negative offset given
+    # TODO maybe configurable filler bytes?
+    if offset < 0:
+        input = (b'\xFF' * abs(offset)) + input
+        offset = 0
+
     key_len = len(key)
     input_len = len(input)
 
     buf = bytes()
-    for input_idx in range(input_len):
+    for input_idx in range(offset, input_len):
         key_idx = input_idx % key_len
         c = input[input_idx] ^ key[key_idx]
         buf += c.to_bytes(1, 'little')

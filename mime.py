@@ -29,10 +29,6 @@ def main(args):
     input = input_fd.read()
     decoded = decode(input, args.input_encoding)
     
-    # DO STUFF HERE
-    # DO THIS HERE
-    # YEAH
-
     output = mime_extract(args.name, decoded)
 
     # TODO maybe return a warning or an error?
